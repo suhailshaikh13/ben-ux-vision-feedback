@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Post-session feedback for Ben’s Pune UX Design Vision talk." />
+    <title>UX Vision Feedback · Pune</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <p class="brand">UX Vision · Pune</p>
+      </header>
+
+      <main>
+        <section class="hero" aria-labelledby="hero-title">
+          <h1 id="hero-title">How did Ben’s vision land?</h1>
+          <p class="lead">
+            Rate how it landed, leave a note, and ask Ben anything. Responses show
+            up below for everyone.
+          </p>
+        </section>
+
+        <section class="panel" aria-labelledby="form-title">
+          <h2 id="form-title" class="section-title">Share feedback</h2>
+          <p class="section-lead">Takes under two minutes. No sign-in.</p>
+
+          <form id="feedback-form" novalidate>
+            <fieldset class="rating-field">
+              <legend>Overall, how did it land? <span class="req">Required</span></legend>
+              <div class="rating-row" role="radiogroup" aria-label="Rating from 1 to 5">
+                <label class="rating-option">
+                  <input type="radio" name="rating" value="1" required />
+                  <span>1</span>
+                  <small>Missed me</small>
+                </label>
+                <label class="rating-option">
+                  <input type="radio" name="rating" value="2" />
+                  <span>2</span>
+                  <small>A little thin</small>
+                </label>
+                <label class="rating-option">
+                  <input type="radio" name="rating" value="3" />
+                  <span>3</span>
+                  <small>Solid</small>
+                </label>
+                <label class="rating-option">
+                  <input type="radio" name="rating" value="4" />
+                  <span>4</span>
+                  <small>Landed well</small>
+                </label>
+                <label class="rating-option">
+                  <input type="radio" name="rating" value="5" />
+                  <span>5</span>
+                  <small>Changed how I think</small>
+                </label>
+              </div>
+            </fieldset>
+
+            <label class="field">
+              <span>Anything to add?</span>
+              <textarea
+                name="reflection"
+                rows="3"
+                maxlength="2000"
+                placeholder="What felt clear, useful, or still open?"
+              ></textarea>
+            </label>
+
+            <label class="field">
+              <span>Ask Ben something</span>
+              <textarea
+                name="question"
+                rows="3"
+                maxlength="1000"
+                placeholder="Optional — what would you want him to weigh in on?"
+              ></textarea>
+            </label>
+
+            <div class="field-row">
+              <label class="field">
+                <span>Name <em>(optional)</em></span>
+                <input type="text" name="name" maxlength="80" placeholder="How should we credit you?" autocomplete="name" />
+              </label>
+              <label class="field">
+                <span>Team <em>(optional)</em></span>
+                <input type="text" name="team" maxlength="80" placeholder="e.g. PLG Design" />
+              </label>
+            </div>
+
+            <!-- Honeypot: leave empty. Hidden from people, catches naive bots. -->
+            <label class="hp" aria-hidden="true">
+              Company website
+              <input type="text" name="website" tabindex="-1" autocomplete="off" />
+            </label>
+
+            <p id="form-error" class="error" role="alert" hidden></p>
+            <p id="form-ok" class="ok" role="status" hidden>Thanks — it’s in.</p>
+
+            <button type="submit" class="btn-primary" id="submit-btn">Send feedback</button>
+          </form>
+        </section>
+
+        <section class="responses" aria-labelledby="responses-title">
+          <div class="responses-head">
+            <h2 id="responses-title" class="section-title">What people said</h2>
+            <button type="button" class="btn-ghost" id="refresh-btn">Refresh</button>
+          </div>
+          <p id="responses-status" class="muted">Loading responses…</p>
+          <ul id="responses-list" class="response-list"></ul>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        Open feedback for Ben’s Pune UX Design Vision session.
+      </footer>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

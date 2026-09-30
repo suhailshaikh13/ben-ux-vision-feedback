@@ -1,0 +1,12 @@
+.DS_Store
+*.log
+.env
+.env.*
+!.env.example
+
+# Legacy React/Vite leftovers (if any remain)
+node_modules/
+dist/
+dist-ssr/
+*.local
+.vite/

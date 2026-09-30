@@ -1,0 +1,374 @@
+:root {
+  --kale-700: #03363d;
+  --kale-600: #0b535b;
+  --kale-500: #1f737c;
+  --grey-100: #f8f9f9;
+  --grey-200: #e9ebed;
+  --grey-400: #c2c8cc;
+  --grey-600: #68737d;
+  --grey-800: #2f3941;
+  --white: #ffffff;
+  --danger: #cc3340;
+  --ok: #0b835c;
+  --radius: 12px;
+  --shadow: 0 10px 28px rgba(3, 54, 61, 0.06);
+  --font: "Vanilla Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font);
+  color: var(--grey-800);
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(31, 115, 124, 0.12), transparent 55%),
+    radial-gradient(900px 500px at 100% 0%, rgba(3, 54, 61, 0.06), transparent 50%),
+    var(--grey-100);
+  line-height: 1.5;
+}
+
+.page {
+  width: min(720px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 48px;
+}
+
+.site-header {
+  margin-bottom: 28px;
+}
+
+.brand {
+  margin: 0;
+  color: var(--kale-700);
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.hero h1 {
+  margin: 0 0 10px;
+  color: var(--kale-700);
+  font-size: clamp(1.75rem, 5vw, 2.25rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.lead,
+.section-lead {
+  margin: 0;
+  color: var(--grey-600);
+  font-size: 16px;
+  max-width: 48ch;
+}
+
+.panel,
+.responses {
+  margin-top: 24px;
+  background: var(--white);
+  border: 1px solid var(--grey-200);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 22px 20px 24px;
+}
+
+.section-title {
+  margin: 0 0 6px;
+  color: var(--kale-700);
+  font-size: 1.125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.section-lead {
+  margin-bottom: 20px;
+  font-size: 14px;
+}
+
+fieldset {
+  border: 0;
+  margin: 0 0 18px;
+  padding: 0;
+}
+
+legend {
+  margin-bottom: 10px;
+  color: var(--kale-700);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.req {
+  margin-left: 6px;
+  color: var(--grey-600);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.rating-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.rating-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 6px;
+  border: 1px solid var(--grey-200);
+  border-radius: 10px;
+  background: var(--grey-100);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.rating-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rating-option span {
+  color: var(--kale-700);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.rating-option small {
+  color: var(--grey-600);
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.rating-option:has(input:checked),
+.rating-option:has(input:focus-visible) {
+  border-color: var(--kale-500);
+  background: #e8f4f5;
+  outline: 2px solid rgba(31, 115, 124, 0.25);
+  outline-offset: 1px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.field > span {
+  color: var(--kale-700);
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.field em {
+  color: var(--grey-600);
+  font-style: normal;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  border: 1px solid var(--grey-200);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font: inherit;
+  color: var(--grey-800);
+  background: var(--white);
+}
+
+.field input:focus,
+.field textarea:focus {
+  outline: 2px solid rgba(31, 115, 124, 0.35);
+  border-color: var(--kale-500);
+}
+
+.field textarea {
+  resize: vertical;
+  min-height: 72px;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0 12px;
+}
+
+@media (min-width: 560px) {
+  .field-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .panel,
+  .responses {
+    padding: 26px 24px 28px;
+  }
+}
+
+.hp {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.error {
+  margin: 0 0 12px;
+  color: var(--danger);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ok {
+  margin: 0 0 12px;
+  color: var(--ok);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.btn-primary,
+.btn-ghost {
+  font: inherit;
+  font-weight: 650;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  background: var(--kale-700);
+  color: var(--white);
+}
+
+.btn-primary:hover {
+  background: var(--kale-600);
+}
+
+.btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  border: 1px solid var(--grey-200);
+  background: var(--white);
+  color: var(--kale-700);
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.btn-ghost:hover {
+  background: var(--grey-100);
+}
+
+.responses-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.muted {
+  margin: 0 0 12px;
+  color: var(--grey-600);
+  font-size: 14px;
+}
+
+.response-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.response-card {
+  border: 1px solid var(--grey-200);
+  border-radius: 10px;
+  padding: 14px 14px 12px;
+  background: var(--grey-100);
+}
+
+.response-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.response-who {
+  color: var(--kale-700);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.response-when,
+.response-rating {
+  color: var(--grey-600);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.response-body,
+.response-ask {
+  margin: 0;
+  color: var(--grey-800);
+  font-size: 14px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.response-ask {
+  margin-top: 8px;
+  padding-left: 10px;
+  border-left: 3px solid var(--kale-500);
+  color: var(--kale-700);
+}
+
+.response-ask::before {
+  content: "Ask Ben · ";
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--kale-500);
+}
+
+.site-footer {
+  margin-top: 28px;
+  color: var(--grey-600);
+  font-size: 13px;
+  text-align: center;
+}
+
+@media (max-width: 420px) {
+  .rating-option small {
+    display: none;
+  }
+}

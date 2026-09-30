@@ -89,7 +89,7 @@ body {
 
 .panel-cover {
   position: relative;
-  height: 112px;
+  height: 148px;
   background: var(--kale-700);
   overflow: hidden;
 }
@@ -257,7 +257,7 @@ legend {
   }
 
   .panel-cover {
-    height: 128px;
+    height: 176px;
   }
 }
 

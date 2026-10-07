@@ -30,7 +30,7 @@ window.FEEDBACK_CONTENT = {
       {
         title: "Project Wrangler",
         body:
-          "Pulling Launchpad and related experiences tighter into admin home and the broader admin surface — so setup and guidance show up where people already work, not as a side path.",
+          "Turning Support toward Agent Workspace — helping agents see what requires their attention, understand what matters most, and take the right next action—whether that means contributing to, reviewing, monitoring, or handing off the work.",
       },
       {
         title: "Changing customer ecosystem",

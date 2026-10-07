@@ -7,36 +7,18 @@
     <meta name="description" content="Quick team pulse after Ben’s Pune UX Design Vision session — rate, what stood out, optional note." />
     <title>UX Vision Feedback · Pune</title>
     <link rel="preconnect" href="https://web-assets.zendesk.com" crossorigin />
-    <link rel="stylesheet" href="styles.css?v=20" />
+    <link rel="stylesheet" href="styles.css?v=21" />
   </head>
   <body>
     <div class="confetti-layer" id="confetti" aria-hidden="true"></div>
 
     <div class="shell">
       <header class="topbar">
-        <button type="button" class="brand brand-btn" id="nav-home" aria-label="Home — back to cover">
-          UX Vision<span>·</span>Pune
-        </button>
-        <div class="journey" id="journey" aria-label="Progress">
-          <button type="button" class="journey-dot is-active" data-dot="cover" aria-label="Cover"></button>
-          <button type="button" class="journey-dot" data-dot="q1" aria-label="Question 1"></button>
-          <button type="button" class="journey-dot" data-dot="q2" aria-label="Question 2"></button>
-          <button type="button" class="journey-dot" data-dot="ask" aria-label="Question 3"></button>
-          <button type="button" class="journey-dot" data-dot="done" aria-label="Results"></button>
-        </div>
+        <p class="brand">UX Vision<span>·</span>Pune</p>
       </header>
 
-      <nav class="step-nav" id="step-nav" aria-label="Step navigation" hidden>
-        <button type="button" class="btn-back" id="nav-back">
-          <span class="btn-back-arrow" aria-hidden="true">←</span>
-          Back
-        </button>
-        <button type="button" class="btn-home" id="nav-home-alt">Home</button>
-      </nav>
-
       <main>
-        <!-- Cover: cinematic hero -->
-        <section id="step-cover" class="step cinema" data-step="cover" aria-labelledby="cover-title">
+        <section class="cinema" aria-labelledby="cover-title">
           <div class="cinema-stage">
             <div class="slideshow" id="cover-slideshow" aria-hidden="true"></div>
             <div class="cinema-scrim" aria-hidden="true"></div>
@@ -50,13 +32,6 @@
             </div>
           </div>
 
-          <div class="cinema-action">
-            <button type="button" class="btn-primary" id="cover-cta">
-              <span>Start feedback</span>
-              <span class="btn-meta">3 questions</span>
-            </button>
-          </div>
-
           <section class="recap-panel" aria-labelledby="recap-title">
             <div class="recap-panel-head">
               <h2 class="recap-heading" id="recap-title">From the talk</h2>
@@ -68,93 +43,68 @@
           </section>
         </section>
 
-        <!-- Q1 rating -->
-        <section id="step-q1" class="step focus" data-step="q1" hidden aria-labelledby="q1-title">
-          <div class="focus-inner">
-            <div class="progress-wrap">
-              <p class="progress" id="q1-progress">Question 1 of 3</p>
-              <div class="progress-track"><span class="progress-fill" id="q1-fill"></span></div>
-            </div>
-            <h2 id="q1-title" class="focus-title"></h2>
+        <form id="feedback-form" class="form-page" novalidate>
+          <section class="form-block" aria-labelledby="q1-title">
+            <h2 id="q1-title" class="form-heading"></h2>
             <div class="rating-grid" id="q1-choices" role="radiogroup"></div>
-          </div>
-        </section>
+          </section>
 
-        <!-- Q2 standout -->
-        <section id="step-q2" class="step focus" data-step="q2" hidden aria-labelledby="q2-title">
-          <div class="focus-inner">
-            <div class="progress-wrap">
-              <p class="progress" id="q2-progress">Question 2 of 3</p>
-              <div class="progress-track"><span class="progress-fill" id="q2-fill"></span></div>
-            </div>
-            <h2 id="q2-title" class="focus-title"></h2>
+          <section class="form-block" aria-labelledby="q2-title">
+            <h2 id="q2-title" class="form-heading"></h2>
             <div class="choice-grid" id="q2-choices" role="group"></div>
-          </div>
-        </section>
+          </section>
 
-        <!-- Q3 open share -->
-        <section id="step-ask" class="step focus" data-step="ask" hidden aria-labelledby="ask-title">
-          <div class="focus-inner focus-inner--narrow">
-            <div class="progress-wrap">
-              <p class="progress" id="ask-progress">Question 3 of 3</p>
-              <div class="progress-track"><span class="progress-fill" id="ask-fill"></span></div>
-            </div>
-            <h2 id="ask-title" class="focus-title"></h2>
+          <section class="form-block form-block--narrow" aria-labelledby="ask-title">
+            <h2 id="ask-title" class="form-heading"></h2>
             <p class="section-lead" id="ask-lead"></p>
 
-            <form id="ask-form" novalidate>
+            <label class="field">
+              <span class="visually-hidden">Anything you’d like to share</span>
+              <textarea name="askBen" id="ask-input" rows="4" maxlength="2000" placeholder=""></textarea>
+            </label>
+
+            <div class="field-row">
               <label class="field">
-                <span class="visually-hidden">Anything you’d like to share</span>
-                <textarea name="askBen" id="ask-input" rows="5" maxlength="2000" placeholder=""></textarea>
+                <span>Name <em>optional</em></span>
+                <input type="text" name="name" id="ask-name" maxlength="80" placeholder="Your name" autocomplete="name" />
               </label>
-
-              <div class="field-row">
-                <label class="field">
-                  <span>Name <em>optional</em></span>
-                  <input type="text" name="name" id="ask-name" maxlength="80" placeholder="Your name" autocomplete="name" />
-                </label>
-                <label class="field">
-                  <span>Team <em>optional</em></span>
-                  <input type="text" name="team" id="ask-team" maxlength="80" placeholder="Design" />
-                </label>
-              </div>
-
-              <label class="hp" aria-hidden="true">
-                Company website
-                <input type="text" name="website" tabindex="-1" autocomplete="off" />
+              <label class="field">
+                <span>Team <em>optional</em></span>
+                <input type="text" name="team" id="ask-team" maxlength="80" placeholder="Design" />
               </label>
-
-              <p id="form-error" class="error" role="alert" hidden></p>
-
-              <div class="btn-row">
-                <button type="button" class="btn-ghost" id="ask-skip">Skip</button>
-                <button type="submit" class="btn-primary" id="ask-submit">
-                  <span>Submit</span>
-                </button>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <!-- Done -->
-        <section id="step-done" class="step focus" data-step="done" hidden aria-labelledby="done-title">
-          <div class="focus-inner">
-            <p class="done-mark" id="done-burst" aria-hidden="true">Done</p>
-            <h2 id="done-title" class="focus-title">Thanks — it’s in.</h2>
-            <p class="section-lead">How the room is answering so far.</p>
-            <p class="sync-status" id="sync-status" hidden role="status"></p>
-
-            <div class="aggregates" id="aggregates">
-              <p class="muted" id="aggregates-status">Loading…</p>
             </div>
+          </section>
 
-            <div class="ask-list-block" id="ask-list-block" hidden>
-              <h3 class="recap-heading">What people shared</h3>
-              <ul id="ask-list" class="ask-list"></ul>
-            </div>
+          <label class="hp" aria-hidden="true">
+            Company website
+            <input type="text" name="website" tabindex="-1" autocomplete="off" />
+          </label>
 
-            <button type="button" class="btn-ghost" id="refresh-btn">Refresh</button>
+          <p id="form-error" class="error" role="alert" hidden></p>
+
+          <div class="form-actions">
+            <button type="submit" class="btn-primary" id="form-submit">
+              <span>Submit feedback</span>
+            </button>
           </div>
+        </form>
+
+        <section id="results" class="results" hidden aria-labelledby="done-title">
+          <p class="done-mark" aria-hidden="true">Done</p>
+          <h2 id="done-title" class="focus-title">Thanks — it’s in.</h2>
+          <p class="section-lead">How the room is answering so far.</p>
+          <p class="sync-status" id="sync-status" hidden role="status"></p>
+
+          <div class="aggregates" id="aggregates">
+            <p class="muted" id="aggregates-status">Loading…</p>
+          </div>
+
+          <div class="ask-list-block" id="ask-list-block" hidden>
+            <h3 class="recap-heading">What people shared</h3>
+            <ul id="ask-list" class="ask-list"></ul>
+          </div>
+
+          <button type="button" class="btn-ghost" id="refresh-btn">Refresh</button>
         </section>
       </main>
 
@@ -163,8 +113,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-    <script src="config.js?v=20"></script>
-    <script src="content.js?v=20"></script>
-    <script src="app.js?v=20"></script>
+    <script src="config.js?v=21"></script>
+    <script src="content.js?v=21"></script>
+    <script src="app.js?v=21"></script>
   </body>
 </html>

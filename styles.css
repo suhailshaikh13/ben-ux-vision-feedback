@@ -311,8 +311,8 @@ body {
 
 .cinema-stage {
   position: relative;
-  height: min(64vh, 520px);
-  min-height: 340px;
+  height: min(42vh, 360px);
+  min-height: 240px;
   border-radius: 24px;
   overflow: hidden;
   background: var(--kale-900);
@@ -363,24 +363,56 @@ body {
   max-width: 680px;
 }
 
-.cinema-action {
+/* ---------- Single-page form ---------- */
+
+.form-page {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 14px 20px;
-  padding: 10px 4px;
-  position: sticky;
-  bottom: 12px;
-  z-index: 6;
-  margin: 0 -4px;
-  border-radius: 18px;
-  background: linear-gradient(
-    180deg,
-    rgba(1, 34, 38, 0) 0%,
-    rgba(1, 34, 38, 0.82) 28%,
-    rgba(1, 34, 38, 0.96) 100%
-  );
-  backdrop-filter: blur(8px);
+  flex-direction: column;
+  gap: 28px;
+  margin-top: 8px;
+  padding: 28px 0 8px;
+}
+
+.form-page[hidden] {
+  display: none !important;
+}
+
+.form-block {
+  margin: 0;
+  padding: 22px 22px 24px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: linear-gradient(165deg, rgba(11, 83, 91, 0.45) 0%, rgba(3, 54, 61, 0.92) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.form-block--narrow {
+  max-width: 640px;
+}
+
+.form-heading {
+  margin: 0 0 18px;
+  font-family: var(--font);
+  font-weight: 700;
+  font-size: clamp(1.25rem, 3vw, 1.6rem);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: var(--text);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-start;
+  padding: 4px 0 12px;
+}
+
+.results {
+  margin-top: 12px;
+  padding: 8px 0 24px;
+}
+
+.results[hidden] {
+  display: none !important;
 }
 
 .eyebrow {
@@ -1063,8 +1095,12 @@ body {
   }
 
   .cinema-stage {
-    height: min(58vh, 460px);
+    height: min(38vh, 300px);
     border-radius: 18px;
+  }
+
+  .form-block {
+    padding: 18px 16px 20px;
   }
 
   .lead {

@@ -10,18 +10,11 @@ Choose-based feedback page for Ben’s Pune UX Design Vision session.
 
 Flow: **cover** → **rating** → **what stood out** → **optional share** → aggregates.
 
-## Before you share with the team
+## Sheet reliability
 
-The static site is on GitHub Pages. The Sheet backend must be on the **choose-based** script (q1 / q2 / askBen), not the old rating form.
+The site sends a **dual payload** (new `q1/q2/askBen` + legacy `rating/reflection/question`) so writes succeed even if the Apps Script deployment is still on the older schema. Submits **retry** and only complete after the Sheet confirms. Locally parked answers are flushed on load.
 
-1. Open the Google Sheet → **Extensions → Apps Script**.
-2. Replace the script with [`apps-script/Code.gs`](apps-script/Code.gs) (keep the same `SHEET_ID`).
-3. **Deploy → Manage deployments → ✎ Edit → Version: New version → Deploy.**
-4. First request after deploy **clears the old test schema/rows** and writes the new headers (`q1`, `q2`, `askBen`, …) plus creates an `events` tab if missing.
-5. Smoke-test once: submit the form, confirm a new row in **responses**.
-6. Share the Pages link.
-
-Full setup notes: [apps-script/README.md](apps-script/README.md).
+Optional but recommended — redeploy [`apps-script/Code.gs`](apps-script/Code.gs) once (Manage deployments → New version) so the Sheet uses the choose-based columns natively. See [apps-script/README.md](apps-script/README.md).
 
 ## Quick start (local)
 

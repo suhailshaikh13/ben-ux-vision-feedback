@@ -184,19 +184,71 @@
   }
 
   function saveLocalResponse(entry) {
-    const list = readLocalResponses()
+    const list = readLocalResponses().filter((row) => row && row.id !== entry.id)
     list.unshift(entry)
     writeLocalResponses(list)
     return entry
   }
 
+  function removeLocalResponse(id) {
+    writeLocalResponses(readLocalResponses().filter((row) => row && row.id !== id))
+  }
+
+  /** Normalize Sheet rows from choose-based OR legacy rating schema. */
+  function normalizeResponse(row) {
+    if (!row || typeof row !== "object") return null
+    if (row.q1 && row.q2) {
+      return {
+        id: String(row.id || ""),
+        createdAt: String(row.createdAt || ""),
+        sessionId: String(row.sessionId || ""),
+        q1: String(row.q1),
+        q2: String(row.q2),
+        askBen: String(row.askBen || ""),
+        name: row.name || null,
+        team: row.team || null,
+      }
+    }
+    if (row.rating != null && String(row.rating) !== "") {
+      return {
+        id: String(row.id || ""),
+        createdAt: String(row.createdAt || ""),
+        sessionId: String(row.sessionId || ""),
+        q1: String(row.rating),
+        q2: String(row.question || ""),
+        askBen: String(row.reflection || ""),
+        name: row.name || null,
+        team: row.team || null,
+      }
+    }
+    return null
+  }
+
   function isModernResponse(row) {
-    return row && typeof row.q1 === "string" && row.q1 && typeof row.q2 === "string" && row.q2
+    const n = normalizeResponse(row)
+    return Boolean(n && n.q1 && n.q2)
+  }
+
+  function buildCreatePayload(entry) {
+    // Send both schemas so writes succeed on the currently deployed script
+    // (legacy rating/reflection/question) and on the choose-based Code.gs.
+    return {
+      action: "create",
+      sessionId: entry.sessionId || "",
+      q1: entry.q1,
+      q2: entry.q2,
+      askBen: entry.askBen || "",
+      name: entry.name || "",
+      team: entry.team || "",
+      rating: Number(entry.q1),
+      reflection: entry.askBen || "",
+      question: entry.q2,
+    }
   }
 
   async function apiRequest(payload) {
     if (!scriptUrl) {
-      throw new Error("NO_SCRIPT_URL")
+      throw new Error("Sheet backend is not configured.")
     }
 
     const res = await fetch(scriptUrl, {
@@ -218,6 +270,48 @@
       throw new Error(data.error || "Request failed.")
     }
     return data
+  }
+
+  function sleep(ms) {
+    return new Promise((resolve) => window.setTimeout(resolve, ms))
+  }
+
+  async function apiRequestWithRetry(payload, attempts = 3) {
+    let lastError
+    for (let i = 0; i < attempts; i++) {
+      try {
+        return await apiRequest(payload)
+      } catch (err) {
+        lastError = err
+        if (i < attempts - 1) await sleep(400 * Math.pow(2, i))
+      }
+    }
+    throw lastError instanceof Error ? lastError : new Error("Could not reach the Sheet.")
+  }
+
+  async function syncEntryToSheet(entry) {
+    const data = await apiRequestWithRetry(buildCreatePayload(entry), 3)
+    if (!data || !data.ok) {
+      throw new Error("Sheet did not confirm the save.")
+    }
+    removeLocalResponse(entry.id)
+    return data
+  }
+
+  async function flushPendingToSheet() {
+    const pending = readLocalResponses().filter(isModernResponse)
+    if (!pending.length) return { synced: 0, failed: 0 }
+    let synced = 0
+    let failed = 0
+    for (const entry of pending) {
+      try {
+        await syncEntryToSheet(entry)
+        synced += 1
+      } catch {
+        failed += 1
+      }
+    }
+    return { synced, failed }
   }
 
   function track(event, step, meta) {
@@ -776,32 +870,21 @@
       team: team || null,
     }
 
-    let synced = false
+    // Always park a local copy first so a tab crash can’t wipe the answer.
+    saveLocalResponse(entry)
+
     try {
-      await apiRequest({
-        action: "create",
-        sessionId: entry.sessionId,
-        q1: entry.q1,
-        q2: entry.q2,
-        askBen: entry.askBen,
-        name: entry.name || "",
-        team: entry.team || "",
-      })
-      synced = true
-      // Drop stale local fallbacks once the Sheet accepts a write.
-      try {
-        localStorage.removeItem(LOCAL_RESPONSES_KEY)
-      } catch {
-        /* ignore */
-      }
-    } catch {
-      // Offline / undeployed script — keep the response locally so the form still completes.
-      saveLocalResponse(entry)
+      await syncEntryToSheet(entry)
+    } catch (err) {
+      const detail = err instanceof Error ? err.message : "unknown error"
+      throw new Error(
+        `Couldn’t save to Google Sheets (${detail}). Your answers are kept on this device — tap Submit again.`,
+      )
     }
 
     markSubmitted()
     track(skipped ? "ask_skip" : "submit", "ask", skipped ? "skip" : "with_question")
-    entry._synced = synced
+    entry._synced = true
     return entry
   }
 
@@ -909,9 +992,10 @@
   function mergeResponses(remote, local) {
     const map = new Map()
     for (const row of [...local, ...remote]) {
-      if (!isModernResponse(row)) continue
-      const key = row.id || `${row.sessionId || ""}-${row.createdAt || ""}-${row.q1}-${row.q2}`
-      if (!map.has(key)) map.set(key, row)
+      const n = normalizeResponse(row)
+      if (!n || !n.q1) continue
+      const key = n.id || `${n.sessionId || ""}-${n.createdAt || ""}-${n.q1}-${n.q2}`
+      if (!map.has(key)) map.set(key, n)
     }
     return [...map.values()].sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)))
   }
@@ -920,25 +1004,41 @@
     const root = document.getElementById("aggregates")
     root.innerHTML = `<p class="muted" id="aggregates-status">Loading…</p>`
 
+    // Push any locally parked answers that never reached the Sheet.
+    const flush = await flushPendingToSheet()
+
     const local = readLocalResponses()
     let remote = []
     let remoteOk = false
 
     try {
-      const data = await apiRequest({ action: "list" })
+      const data = await apiRequestWithRetry({ action: "list" }, 2)
       remote = Array.isArray(data.responses) ? data.responses : []
       remoteOk = true
     } catch {
       // fall through to local-only
     }
 
-    const remoteModern = remote.filter(isModernResponse)
-    // Prefer Sheet once it has choose-based rows; otherwise keep local fallbacks.
+    const remoteNorm = remote.map(normalizeResponse).filter(Boolean)
     const rows =
-      remoteOk && remoteModern.length
-        ? remoteModern
-        : mergeResponses(remoteModern, local)
+      remoteOk && remoteNorm.length ? remoteNorm : mergeResponses(remoteNorm, local)
+
     renderAggregates(rows)
+
+    const status = document.getElementById("sync-status")
+    if (status) {
+      if (flush.failed > 0 || (!remoteOk && local.length)) {
+        status.hidden = false
+        status.textContent =
+          "Some answers are still syncing to the Sheet. Keep this tab open or tap Refresh."
+      } else if (flush.synced > 0) {
+        status.hidden = false
+        status.textContent = "Synced saved answers to Google Sheets."
+      } else {
+        status.hidden = true
+        status.textContent = ""
+      }
+    }
   }
 
   function goToDone() {
@@ -1029,6 +1129,9 @@
   renderChoices("q1", "q1-choices", "q1-title")
   renderChoices("q2", "q2-choices", "q2-title")
   renderAsk()
+
+  // Recover any answers parked locally from earlier failed Sheet writes.
+  void flushPendingToSheet()
 
   if (state.submitted) {
     // Resume results after refresh — don’t re-run the form.

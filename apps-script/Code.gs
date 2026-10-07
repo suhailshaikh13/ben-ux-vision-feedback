@@ -113,8 +113,13 @@ function listResponses_() {
 }
 
 function createResponse_(body) {
-  var q1 = String(body.q1 || "").trim()
-  var q2 = String(body.q2 || "").trim()
+  // Prefer choose-based fields; accept legacy rating/reflection/question too.
+  var q1Raw = body.q1 != null && String(body.q1) !== "" ? body.q1 : body.rating
+  var q2Raw = body.q2 != null && String(body.q2) !== "" ? body.q2 : body.question
+  var askRaw = body.askBen != null && String(body.askBen) !== "" ? body.askBen : body.reflection
+  var q1 = String(q1Raw == null ? "" : q1Raw).trim()
+  var q2 = String(q2Raw == null ? "" : q2Raw).trim()
+  var askBen = String(askRaw == null ? "" : askRaw).trim()
 
   if (!Q1_IDS[q1]) {
     throw new Error("Pick a rating from 1 to 5.")
@@ -129,7 +134,7 @@ function createResponse_(body) {
     sessionId: truncate_(String(body.sessionId || "").trim(), 80),
     q1: q1,
     q2: q2,
-    askBen: truncate_(String(body.askBen || "").trim(), 2000),
+    askBen: truncate_(askBen, 2000),
     name: truncate_(String(body.name || "").trim(), 80) || null,
     team: truncate_(String(body.team || "").trim(), 80) || null,
   }
@@ -200,8 +205,38 @@ function ensureHeader_(sheet, headers) {
   var expected = headers.join("|")
   var current = existing.join("|")
 
-  // Empty sheet, or old schema (e.g. rating/reflection) — wipe and write launch headers.
-  if (!current || current !== expected) {
+  if (current === expected) return
+
+  if (!current) {
+    sheet.getRange(1, 1, 1, headers.length).setValues([headers])
+    return
+  }
+
+  // Migrate legacy: id | createdAt | rating | reflection | question | name | team
+  if (existing[2] === "rating" || existing.indexOf("rating") !== -1) {
+    var values = sheet.getDataRange().getValues()
+    var migrated = [headers]
+    for (var r = 1; r < values.length; r++) {
+      var row = values[r]
+      if (!row[0] && !row[2]) continue
+      migrated.push([
+        String(row[0] || ""),
+        String(row[1] || ""),
+        "",
+        String(row[2] != null ? row[2] : ""), // rating → q1
+        String(row[4] || ""), // question → q2
+        String(row[3] || ""), // reflection → askBen
+        String(row[5] || ""),
+        String(row[6] || ""),
+      ])
+    }
+    sheet.clear()
+    sheet.getRange(1, 1, migrated.length, headers.length).setValues(migrated)
+    return
+  }
+
+  // Unknown schema with no data rows — rewrite headers only.
+  if (sheet.getLastRow() <= 1) {
     sheet.clear()
     sheet.getRange(1, 1, 1, headers.length).setValues([headers])
   }

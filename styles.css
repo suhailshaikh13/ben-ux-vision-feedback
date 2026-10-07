@@ -926,6 +926,17 @@ body {
   font-size: 14px;
 }
 
+.sync-status {
+  margin: -8px 0 16px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(94, 184, 194, 0.35);
+  background: rgba(47, 138, 147, 0.16);
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
 .aggregates {
   margin: 8px 0 24px;
 }

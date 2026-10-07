@@ -5,7 +5,7 @@
   const LOCAL_RESPONSES_KEY = "ben-ux-vision-responses"
   const SUBMITTED_KEY = "ben-ux-vision-submitted"
   const EPOCH_KEY = "ben-ux-vision-epoch"
-  const DATA_EPOCH = "single-page-2026-10-07"
+  const DATA_EPOCH = "test-reset-2026-10-07"
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
   const gsap = window.gsap
 

@@ -61,10 +61,34 @@ var Q2_IDS = {
   headless: true,
 }
 
+/**
+ * RUN THIS FROM THE APPS SCRIPT EDITOR to wipe test rows:
+ * 1. Select resetForTesting in the function dropdown (top bar)
+ * 2. Click Run ▶
+ * 3. Approve permissions if asked
+ * Keeps header row; clears responses + events data.
+ */
+function resetForTesting() {
+  clearTabKeepHeader_(RESPONSES_TAB, RESPONSE_HEADERS)
+  clearTabKeepHeader_(EVENTS_TAB, EVENT_HEADERS)
+}
+
+function clearTabKeepHeader_(tabName, headers) {
+  var ss = SpreadsheetApp.openById(SHEET_ID)
+  var sheet = ss.getSheetByName(tabName)
+  if (!sheet) {
+    sheet = ss.insertSheet(tabName)
+  }
+  sheet.clear()
+  sheet.getRange(1, 1, 1, headers.length).setValues([headers])
+  sheet.setFrozenRows(1)
+  sheet.getRange(1, 1, 1, headers.length).setFontWeight("bold")
+}
+
 function doGet() {
   return json_({
     ok: true,
-    hint: "POST JSON with action list, create, or event.",
+    hint: "POST JSON with action list, create, event, or reset.",
   })
 }
 
@@ -83,7 +107,12 @@ function doPost(e) {
     if (action === "event") {
       return json_({ ok: true, event: createEvent_(body) })
     }
-    return json_({ error: "Unknown action. Use list, create, or event." })
+    if (action === "reset") {
+      // Optional web reset after redeploy — same as resetForTesting()
+      resetForTesting()
+      return json_({ ok: true, cleared: true })
+    }
+    return json_({ error: "Unknown action. Use list, create, event, or reset." })
   } catch (err) {
     return json_({ error: String(err && err.message ? err.message : err) })
   }

@@ -7,22 +7,32 @@
     <meta name="description" content="Quick team pulse after Ben’s Pune UX Design Vision session — rate, what stood out, optional note." />
     <title>UX Vision Feedback · Pune</title>
     <link rel="preconnect" href="https://web-assets.zendesk.com" crossorigin />
-    <link rel="stylesheet" href="styles.css?v=18" />
+    <link rel="stylesheet" href="styles.css?v=19" />
   </head>
   <body>
     <div class="confetti-layer" id="confetti" aria-hidden="true"></div>
 
     <div class="shell">
       <header class="topbar">
-        <p class="brand">UX Vision<span>·</span>Pune</p>
+        <button type="button" class="brand brand-btn" id="nav-home" aria-label="Home — back to cover">
+          UX Vision<span>·</span>Pune
+        </button>
         <div class="journey" id="journey" aria-label="Progress">
-          <span class="journey-dot is-active" data-dot="cover"></span>
-          <span class="journey-dot" data-dot="q1"></span>
-          <span class="journey-dot" data-dot="q2"></span>
-          <span class="journey-dot" data-dot="ask"></span>
-          <span class="journey-dot" data-dot="done"></span>
+          <button type="button" class="journey-dot is-active" data-dot="cover" aria-label="Cover"></button>
+          <button type="button" class="journey-dot" data-dot="q1" aria-label="Question 1"></button>
+          <button type="button" class="journey-dot" data-dot="q2" aria-label="Question 2"></button>
+          <button type="button" class="journey-dot" data-dot="ask" aria-label="Question 3"></button>
+          <button type="button" class="journey-dot" data-dot="done" aria-label="Results"></button>
         </div>
       </header>
+
+      <nav class="step-nav" id="step-nav" aria-label="Step navigation" hidden>
+        <button type="button" class="btn-back" id="nav-back">
+          <span class="btn-back-arrow" aria-hidden="true">←</span>
+          Back
+        </button>
+        <button type="button" class="btn-home" id="nav-home-alt">Home</button>
+      </nav>
 
       <main>
         <!-- Cover: cinematic hero -->
@@ -152,8 +162,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
-    <script src="config.js?v=18"></script>
-    <script src="content.js?v=18"></script>
-    <script src="app.js?v=18"></script>
+    <script src="config.js?v=19"></script>
+    <script src="content.js?v=19"></script>
+    <script src="app.js?v=19"></script>
   </body>
 </html>

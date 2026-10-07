@@ -38,11 +38,19 @@
     q1: null,
     q2: null,
     currentStep: "cover",
+    furthest: "cover",
     transitioning: false,
     slideshowTween: null,
     choiceLocked: false,
     activeTimeline: null,
     submitted: hasSubmitted(),
+  }
+
+  const PREV_STEP = {
+    q1: "cover",
+    q2: "q1",
+    ask: "q2",
+    done: "cover",
   }
 
   function getOrCreateSessionId() {
@@ -87,13 +95,74 @@
       .replace(/"/g, "&quot;")
   }
 
+  function stepIndex(name) {
+    return STEP_ORDER.indexOf(name)
+  }
+
+  function canVisit(step) {
+    if (!STEP_ORDER.includes(step)) return false
+    if (step === state.currentStep) return false
+    if (state.submitted) return step === "cover" || step === "done"
+    if (step === "done") return false
+    return stepIndex(step) <= stepIndex(state.furthest)
+  }
+
+  function updateStepNav(active) {
+    const nav = document.getElementById("step-nav")
+    if (!nav) return
+    const show = active !== "cover"
+    nav.hidden = !show
+  }
+
   function updateJourney(active) {
-    const idx = STEP_ORDER.indexOf(active)
+    const idx = stepIndex(active)
     document.querySelectorAll(".journey-dot").forEach((dot) => {
-      const i = STEP_ORDER.indexOf(dot.dataset.dot)
+      const name = dot.dataset.dot
+      const i = stepIndex(name)
+      const reachable = canVisit(name) || name === active
       dot.classList.toggle("is-active", i === idx)
       dot.classList.toggle("is-done", i < idx)
+      dot.classList.toggle("is-reachable", reachable && name !== active)
+      dot.disabled = !reachable
+      dot.setAttribute("aria-current", name === active ? "step" : "false")
     })
+    updateStepNav(active)
+  }
+
+  function restoreSelections(stepName) {
+    const map = {
+      q1: { id: state.q1, root: "q1-choices" },
+      q2: { id: state.q2, root: "q2-choices" },
+    }
+    const conf = map[stepName]
+    if (!conf || !conf.id) return
+    const root = document.getElementById(conf.root)
+    if (!root) return
+    root.querySelectorAll(".choice-btn, .rating-btn").forEach((btn) => {
+      const on = btn.dataset.choiceId === conf.id
+      btn.classList.toggle("is-selected", on)
+      if (btn.getAttribute("role") === "radio") {
+        btn.setAttribute("aria-checked", on ? "true" : "false")
+      }
+      btn.style.opacity = ""
+      btn.style.transform = ""
+    })
+  }
+
+  function goHome() {
+    if (state.transitioning) return
+    if (state.currentStep === "cover") {
+      window.scrollTo({ top: 0, left: 0, behavior: reduceMotion ? "auto" : "smooth" })
+      return
+    }
+    goToStep("cover")
+  }
+
+  function goBack() {
+    if (state.transitioning) return
+    const prev = PREV_STEP[state.currentStep]
+    if (!prev) return
+    goToStep(prev)
   }
 
   function readLocalResponses() {
@@ -359,6 +428,7 @@
 
   function selectChoice(questionKey, btn, choiceId, container) {
     state.choiceLocked = true
+    state.transitioning = true
     const selectable = container.querySelectorAll(".choice-btn, .rating-btn")
     selectable.forEach((b) => {
       b.classList.remove("is-selected")
@@ -367,13 +437,16 @@
     btn.classList.add("is-selected")
     if (btn.getAttribute("role") === "radio") btn.setAttribute("aria-checked", "true")
 
+    // Persist before transition so Back restores the latest pick.
+    if (questionKey === "q1") state.q1 = choiceId
+    else state.q2 = choiceId
+
     const advance = () => {
+      state.transitioning = false
       if (questionKey === "q1") {
-        state.q1 = choiceId
         track("q1_select", "q1", choiceId)
         goToStep("q2")
       } else {
-        state.q2 = choiceId
         track("q2_select", "q2", choiceId)
         goToStep("ask")
       }
@@ -382,6 +455,7 @@
     if (gsap && !reduceMotion) {
       const others = [...selectable].filter((b) => b !== btn)
       const tl = gsap.timeline({ onComplete: advance })
+      state.activeTimeline = tl
       tl.to(btn, { scale: 1.04, duration: 0.16, ease: "back.out(2)" })
         .to(others, { opacity: 0.4, duration: 0.2, ease: "power2.out" }, 0.04)
         .to({}, { duration: 0.22 })
@@ -453,7 +527,11 @@
     const finishEnter = () => {
       state.transitioning = false
       resetStepStyles(to)
+      restoreSelections(name)
       focusStep(to)
+      if (name === "cover") {
+        startSlideshow(document.getElementById("cover-slideshow"))
+      }
       if (name === "done") {
         // Celebrate only when arriving from the form, not on refresh resume.
         if (from && from.dataset.step === "ask") burstConfetti()
@@ -468,6 +546,9 @@
       }
       to.hidden = false
       state.currentStep = name
+      if (stepIndex(name) > stepIndex(state.furthest) && !state.submitted) {
+        state.furthest = name
+      }
       updateJourney(name)
       window.scrollTo({ top: 0, left: 0, behavior: reduceMotion ? "auto" : "smooth" })
     }
@@ -867,6 +948,19 @@
 
   /* ---------- Wire UI ---------- */
 
+  document.getElementById("nav-home").addEventListener("click", goHome)
+  document.getElementById("nav-home-alt").addEventListener("click", goHome)
+  document.getElementById("nav-back").addEventListener("click", goBack)
+
+  document.querySelectorAll(".journey-dot").forEach((dot) => {
+    dot.addEventListener("click", () => {
+      if (state.transitioning || dot.disabled) return
+      const target = dot.dataset.dot
+      if (!canVisit(target)) return
+      goToStep(target)
+    })
+  })
+
   const coverCta = document.getElementById("cover-cta")
   coverCta.addEventListener("click", () => {
     if (state.transitioning) return
@@ -945,6 +1039,7 @@
     steps.cover.hidden = true
     steps.done.hidden = false
     state.currentStep = "done"
+    state.furthest = "done"
     updateJourney("done")
     void loadAggregates()
   } else {
